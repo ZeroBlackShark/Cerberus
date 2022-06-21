@@ -25,16 +25,14 @@ Cerberus is a layer 7 network stress testing tool that has a wide variety of nor
 It's written in Python3 and is usable on all systems with Python installed.
 
 # Depencies
-- Python3
+- Python 3.6 or higher
 - TOR, for the TOR specific attacks
 - Installing all python depencies:
     - `pip install -r requirements.txt`
 
 # License
 ```sh
-MIT License
-
-Copyright (c) 2022 Nexus
+Copyright (c) 2022 Nexus/Nexuzzzz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

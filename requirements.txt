@@ -1,2 +1,6 @@
 requests
 colorama
+cloudscraper
+selenium
+undetected_chromedriver
+argparse
