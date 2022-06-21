@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# PyRight configuration file
+pyrightconfig.json
+
 # C extensions
 *.so
 
