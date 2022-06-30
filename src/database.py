@@ -74,6 +74,9 @@ class database():
         with open(os.path.join('database', 'db.db'), 'w+') as fd: # first, we create the file
             pass
 
+        if os.path.isfile(os.path.join('database', '.empty')):
+            os.remove(os.path.join('database', '.empty'))
+
         self.connect() # then we connect
 
         # and now we make the tables
@@ -81,8 +84,7 @@ class database():
             identifier txt,
             target txt,
             attack_vector txt,
-            workers int,
-            isrunning int
+            workers int
         )''', commit=True)
 
         self.disconnect()
@@ -97,8 +99,7 @@ class database():
             'identifier': log[1], # attack identifier
             'target': log[2], # target url
             'attack_vector': log[3], # method
-            'workers': log[4], # amount of threads
-            'isrunning': log[5] == 1 # checks if the attack is running
+            'workers': log[4] # amount of threads
         }
     
     def save_log(self, log) -> None:
@@ -107,12 +108,12 @@ class database():
         '''
 
         self.query(
-            'INSERT INTO logs VALUES (?, ?, ?, ?, ?, 0)', # query
+            'INSERT INTO logs VALUES (?, ?, ?, ?, ?)', # query
             (utils().posix2unix(log['timestamp']), utils().make_id(), log['target'], log['attack_vector'], log['workers']), # arguments
             True # save after we insert this data in the table
         )
     
-    def get_logs(self, running=False) -> list:
+    def get_logs(self) -> list:
         '''
         Gets all the logs from the database
         '''
@@ -120,13 +121,8 @@ class database():
         if self.db is None: # maybe not connected yet
             self.connect()
 
-        query = 'SELECT * FROM logs'
-        if running == True: query += ' WHERE isrunning=1'
-        elif running == False: query += ' WHERE isrunning=0'
-        else: pass
-
         logs = []
-        for row in self.query(query).fetchall():
+        for row in self.query('SELECT * FROM logs').fetchall():
             logs.append(self.parse_log(row))
         
         return logs

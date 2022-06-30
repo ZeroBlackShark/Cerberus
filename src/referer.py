@@ -22,13 +22,22 @@ SOFTWARE.
 
 '''
 
-from threading import Lock
+'''
+Python module to generate random referers
+'''
 
-class Core:
-    threadLock = Lock()
-    methods = {}
-    infodict = {}
-    attackrunning = True
-    threadcount = 0
-    bypass_cache = True
-    session = None
+from random import randint, choice
+from os.path import dirname, abspath, join
+
+with open(join(dirname(abspath(__file__)), 'files', 'referers.txt'), buffering=(16*1024*1024)) as file:
+    referers = file.read().split('\n')
+
+def getReferer() -> str:
+    '''
+    Creates the random referer
+    '''
+    
+    return choice([
+        choice(['http://', 'https://']) +  '.'.join([str(randint(1,255)) for _ in range(4)]), # sadly we can't use utils().genip here, due to circular imports
+        choice(referers).rstrip() # pick one from the referers.txt file
+    ])

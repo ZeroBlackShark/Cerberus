@@ -26,9 +26,9 @@ It's written in Python3 and is usable on all systems with Python installed.
 
 # Depencies
 - Python 3.6 or higher
-- TOR, for the TOR specific attacks
-- Installing all python depencies:
-    - `pip install -r requirements.txt`
+- TOR, for the TOR specific attacks (if TOR is not found, Cerberus will use tor2web gateways)
+- Everything can be installed with the `setup.py` script:
+    - `python3 setup.py`
 
 # License
 ```sh
