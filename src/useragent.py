@@ -75,7 +75,7 @@ def getAgent() -> str:
             'pyrequests': f'python-requests/{choice(agents["pyrequests"])}',
             'curl': f'Curl/{choice(agents["curl"])}',
             'wget': f'Wget/{choice(agents["wget"])}',
-            'apt': f'Debian APT-HTTP/{choice(["0","1"])}.{str(randint(1,9))} ({choice(agents["apt"])})'
+            'apt': choice([f'Debian APT-HTTP/{choice(["0","1"])}.{str(randint(1,9))} ({choice(agents["apt"])})', f'Debian APT-HTTP/{choice(["0","1"])}.{str(randint(1,9))} ({choice(agents["apt"])}) non-interactive'])
         }.get(choice(other))
 
     return agent

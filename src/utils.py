@@ -277,7 +277,8 @@ class utils():
         if randint(0,1) == 1: headers.update({'Upgrade-Insecure-Requests': '1'})        
         if randint(0,1) == 1: headers.update({'Referer': self.buildblock(getReferer())})        
         if randint(0,1) == 1: headers.update({'Cookie': self.buildcookie()}) # adds a fake cookie
-        if randint(0,1) == 1: headers.update({ choice(['Via','Client-IP','X-Forwarded-For','Real-IP']): self.randip() }) # fakes the source ip
+        if randint(0,1) == 1: headers.update({choice(['Via','Client-IP','X-Forwarded-For','Real-IP']): self.randip() }) # fakes the source ip
+        if randint(0,1) == 1: headers.update({'DNT': choice(['0','1'])})
         
         return headers
     

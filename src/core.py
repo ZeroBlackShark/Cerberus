@@ -32,3 +32,4 @@ class Core:
     threadcount = 0
     bypass_cache = True
     session = None
+    ddosguard_cookies_grabbed = False
