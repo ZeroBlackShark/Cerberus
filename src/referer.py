@@ -30,7 +30,7 @@ from random import randint, choice
 from os.path import dirname, abspath, join
 
 with open(join(dirname(abspath(__file__)), 'files', 'referers.txt'), buffering=(16*1024*1024)) as file:
-    referers = file.read().split('\n')
+    referers = file.read().splitlines()
 
 def getReferer() -> str:
     '''

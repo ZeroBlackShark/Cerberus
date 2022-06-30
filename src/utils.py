@@ -22,8 +22,8 @@ SOFTWARE.
 
 '''
 
-import re, requests, socket, os, urllib3, json
-from random import getrandbits, choice, randint, shuffle, randrange
+import re, requests, socket, os, urllib3
+from random import getrandbits, choice, randint, shuffle
 from binascii import hexlify
 from netaddr import IPNetwork
 from datetime import datetime, timedelta
@@ -278,7 +278,7 @@ class utils():
         if randint(0,1) == 1: headers.update({'Referer': self.buildblock(getReferer())})        
         if randint(0,1) == 1: headers.update({'Cookie': self.buildcookie()}) # adds a fake cookie
         if randint(0,1) == 1: headers.update({choice(['Via','Client-IP','X-Forwarded-For','Real-IP']): self.randip() }) # fakes the source ip
-        if randint(0,1) == 1: headers.update({'DNT': choice(['0','1'])})
+        if randint(0,1) == 1: headers.update({'DNT': '1'})
         
         return headers
     
