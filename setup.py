@@ -34,6 +34,8 @@ def main():
     '''
 
     print('Setting Cerberus up, please be patient')
+    
+    #TODO: dont hardcode the download urls, but parse the most recent one
     if sys.platform == 'windows':
         #print(' - Windows detected, Cerberus will use "requests" instead of "PyCurl".')
 

@@ -61,6 +61,49 @@ class utils():
         self.hostregex = re.compile(r'[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}')
         self.urlregex = re.compile(r'(http|https):\/\/([\w\- ]+(?:(?:\.[\w\- ]+)+))([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?')
     
+    def tor_gateway(self) -> str:
+        '''
+        Gets a random Tor2web gateway
+        '''
+
+        return choice([
+            'onion.city',
+            'onion.cab',
+            'onion.direct',
+            'onion.sh',
+            'onion.link',
+            'onion.ws',
+            'onion.pet',
+            'onion.rip',
+            'onion.plus',
+            'onion.top',
+            'onion.si',
+            'onion.ly',
+            'onion.my',
+            'onion.sh',
+            'onion.lu',
+            'onion.casa',
+            'onion.com.de',
+            'onion.foundation',
+            'onion.rodeo',
+            'onion.lat',
+            'tor2web.org',
+            'tor2web.fi',
+            'tor2web.blutmagie.de',
+            'tor2web.to',
+            'tor2web.io',
+            'tor2web.in',
+            'tor2web.it',
+            'tor2web.xyz',
+            'tor2web.su',
+            'darknet.to',
+            's1.tor-gateways.de',
+            's2.tor-gateways.de',
+            's3.tor-gateways.de',
+            's4.tor-gateways.de',
+            's5.tor-gateways.de'
+        ])
+    
     def buildsession(self) -> requests.session:
         '''
         Creates a requests.session object
@@ -93,9 +136,6 @@ class utils():
         Function to generate a block of junk, that gets added to the target url
         '''
 
-        def format(string):
-            return quote(string)
-
         if url is None: return url
         block = '' if url.endswith('/') else '/'
 
@@ -106,16 +146,16 @@ class utils():
                 rand = randint(0, 3)
                 if rand == 0: block += f'/{self.randstr(randint(5, 10))}'
                 elif rand == 1: block += choice(['/..','\\..','%2F..','%5C..']) # magik
-                else: block += f'/{self.randstr(randint(5, 10), chars="0123456789")}'
+                else: block += f'/{choice(keywords).replace(" ","/")}'
             
             block += f'?{quote(choice(keywords))}={self.randstr(randint(5, 10))}'
 
             for _ in range(randint(2, 9)):
-                if randint(0, 1) == 1: block += f'&{self.randstr(randint(5, 10))}={format(choice(keywords))}'
-                else: block += f'&{format(choice(keywords))}={format(choice(keywords))}'
+                if randint(0, 1) == 1: block += f'&{self.randstr(randint(5, 10))}={quote(choice(keywords))}'
+                else: block += f'&{quote(choice(keywords))}={quote(choice(keywords))}'
 
             if randint(0, 2) == 0:
-                block += f'#{format(choice(keywords))}'
+                block += f'#{quote(choice(keywords))}'
 
             return url+block
         else:
@@ -260,13 +300,6 @@ class utils():
         '''
 
         return hexlify(getrandbits(128).to_bytes(16, 'little')).decode() # make a simple 32 characters long ID
-    
-    def valid_port(self, port: int) -> bool:
-        '''
-        Checks if the specified port is valid
-        '''
-
-        return port >= 0 and port < 65535 # 0 should be invalid, but since we count that as "random" we'll allow it
     
     def valid_ip(self, ip) -> bool:
         '''
