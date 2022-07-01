@@ -28,7 +28,8 @@ class Core:
     threadLock = Lock()
     methods = {}
     infodict = {}
-    attackrunning = True
+    attackrunning = False
+    killattack = False
     threadcount = 0
     bypass_cache = True
     session = None

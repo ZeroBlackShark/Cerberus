@@ -30,7 +30,10 @@ from src.useragent import *
 def flood(attack_id, url, stoptime) -> None:
     if not Core.proxy_pool: return # proxy pool empty? just stop the function
 
-    while time.time() < stoptime and Core.attackrunning:
+    while time.time() < stoptime and not Core.killattack:
+        if not Core.attackrunning:
+            continue
+        
         try:
 
             proxy = utils().get_proxy()

