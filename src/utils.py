@@ -38,6 +38,9 @@ from src.referer import *
 with open(join(dirname(abspath(__file__)), 'files', 'keywords.txt'), buffering=(16*1024*1024)) as file:
     keywords = file.read().splitlines()
 
+with open(join(dirname(abspath(__file__)), 'files', 'openredirects.txt'), buffering=(16*1024*1024)) as file:
+    openredirects = file.read().splitlines()
+
 class HTTPAdapter(requests.adapters.HTTPAdapter):
     '''
     HTTP adapter which allows socket modification
@@ -99,6 +102,17 @@ class utils():
         self.content_types = ['multipart/form-data', 'application/x-url-encoded']
         self.accepts = ['text/plain', '*/*', '/', 'application/json', 'text/html', 'application/xhtml+xml', 'application/xml', 'image/webp', 'image/*', 'image/jpeg', 'application/x-ms-application', 'image/gif', 'application/xaml+xml', 'image/pjpeg', 'application/x-ms-xbap', 'application/x-shockwave-flash', 'application/msword']
     
+    def get_proxy(self, force_give=False) -> str:
+        '''
+        Gets a random cookie from the "proxy_file" variable that was defined by the user
+        '''
+
+        if force_give and Core.proxy_pool != None or len(Core.proxy_pool) > 0:
+            proxy = f'{Core.proxy_proto.lower()}h://{choice(Core.proxy_pool)}'
+        else: proxy = None
+
+        return {'http': proxy, 'https': proxy}
+
     def tor_gateway(self) -> str:
         '''
         Gets a random Tor2web gateway

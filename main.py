@@ -118,7 +118,7 @@ SOFTWARE.
     parser.add_argument(            '--proxy-proto',     action='store',      dest='proxy_proto', metavar='protocol',     type=str,    help='Proxy protocol (SOCKS4, SOCKS5, HTTP)', default='SOCKS5')
     parser.add_argument('-logs',    '--list-logs',       action='store_true', dest='list_logs',                                        help='List all attack logs', default=False)
     parser.add_argument('-methods', '--list-methods',    action='store_true', dest='list_methods',                                     help='List all the attack methods', default=False)
-    parser.add_argument('-bc',      '--bypass-cache',    action='store_true', dest='bypass_cache',                                     help='Try to bypass any caching systems to ensure we hit the main servers', default=False)
+    parser.add_argument('-bc',      '--bypass-cache',    action='store_true', dest='bypass_cache',                                     help='Try to bypass any caching systems to ensure we hit the main servers', default=True)
     parser.add_argument('-y',       '--yes-to-all',      action='store_true', dest='yes_to_all',                                       help='Skip any user prompts, and just launch the attack', default=False)
     parser.add_argument(            '--http-version',    action='store',      dest='http_ver',    metavar='http version', type=str,    help='Set the HTTP protocol version', default='1.1')
     args = vars(parser.parse_args()) # parse the arguments
@@ -153,6 +153,18 @@ SOFTWARE.
         sys.exit(f'\n - Error, method "{attack_method}" does not exist.\n')
     
     Core.bypass_cache = args['bypass_cache']
+    Core.proxy_proto = args['proxy_proto']
+
+    if args['proxy_file']:
+        Core.proxy_pool = []
+        if not os.path.isfile(args['proxy_file']):
+            sys.exit(f'\n - Error, "{args["proxy_file"]}" not found\n')
+        
+        with open(args['proxy_file'], buffering=(2048*2048)) as fd:
+            [Core.proxy_pool.append(x.rstrip()) for x in fd.readlines() if bool(re.match(r'\d+\.\d+\.\d+\.\d+', x))] # sadly no ipv6 supported (yet)
+        
+        if Core.proxy_pool == []:
+            sys.exit(f'\n - Error, no proxies collected, maybe wrong file?\n')
     
     print(' + Current attack configuration:')
     print(f'   - Target: {args["target_url"]}')
@@ -161,6 +173,10 @@ SOFTWARE.
     print(f'   - Method/Vector: {args["method"]}')
     print(f'   - Cache bypass? {str(Core.bypass_cache)}')
     print(f'   - HTTP protocol version: {str(args["http_ver"])}')
+
+    if args['proxy_file']:
+        print(f'   - Proxies loaded: {str(len(Core.proxy_pool))}')
+        print(f'   - Global proxy protocol: {str(Core.proxy_proto)}')
 
     if not args['yes_to_all']:
         if not input('\n + Correct? (Y/n) ').lower().startswith('y'):

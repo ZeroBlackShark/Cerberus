@@ -33,9 +33,6 @@ from src.useragent import *
 from random import choice
 from base64 import b64encode
 
-with open(join(dirname(abspath(__file__)), 'files', 'openredirects.txt'), buffering=(16*1024*1024)) as file:
-    openredirects = file.read().splitlines()
-
 def flood(attack_id, url, stoptime) -> None:
 
     while time.time() < stoptime and Core.attackrunning:

