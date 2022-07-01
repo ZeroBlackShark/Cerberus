@@ -29,6 +29,12 @@ It's written in Python3 and is usable on all systems with Python installed.
 - Everything can be installed with the `setup.py` script:
     - `python3 setup.py`
 
+# Contributing
+If you want to contribute, you can do so by 
+- Creating a new method, more information can be found in `src/methods`
+- Creating a pull request
+- Donate
+
 # License
 ```sh
 Copyright (c) 2022 Nexus/Nexuzzzz
