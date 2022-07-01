@@ -74,9 +74,6 @@ class database():
         with open(os.path.join('database', 'db.db'), 'w+') as fd: # first, we create the file
             pass
 
-        if os.path.isfile(os.path.join('database', '.empty')):
-            os.remove(os.path.join('database', '.empty'))
-
         self.connect() # then we connect
 
         # and now we make the tables

@@ -226,19 +226,25 @@ class utils():
 
         return '.'.join([str(randint(1,255)) for _ in range(4)])
     
-    def buildcookie(self) -> str:
+    def buildcookie(self, size=0) -> str:
         '''
-        Creates a random cookie
+        Creates a random cookie, size is more a limit of the "randomization"
         '''
 
+        def giveint():
+            if size == 0:
+                return randint(1,1000)
+
+            return size
+
         cookie = choice([
-            self.randstr(randint(60, 90), chars='QWERTYUIOPASDFGHJKLZXCVBNM01234567890'),
-            f'_ga=GA{str(randint(1,1000))} _gat=1;{(self.randstr(randint(2,22)))}; __cfduid={self.randstr(randint(2,100), chars="qwertyuiopasdfghjklzxcvbnm0123456789")}; {self.randstr(randint(1,10))}={self.randstr(randint(100,200))}'
-            f'id={self.randstr(randint(10,60))}',
-            f'PHPSESSID={self.randstr(randint(50,60))}; csrftoken={self.randstr(randint(4,20))}; _gat={str(randint(0,1))}',
-            f'cf_chl_2={self.randstr(randint(4,20))}; cf_chl_prog=x11; cf_clearance={self.randstr(randint(30,50))}',
-            f'__cf_bm={self.randstr(randint(100,200))}; __cf_bm={self.randstr(randint(100,200))}',
-            f'language=en; AKA_A2={self.randstr(randint(1,10))}; AMCVS_3AE7BD6E597F48940A495ED0%40AdobeOrg={str(randint(0,1))}; AMCV_{self.randstr(randint(20,60))}={self.randstr(randint(50,100))}; ak_bmsc={self.randstr(randint(50,100), chars="QWERTYUIOPASDFGHJKLZXCVBNM")}~{self.randstr(randint(200,600))}'
+            self.randstr(giveint(), chars='QWERTYUIOPASDFGHJKLZXCVBNM01234567890'),
+            f'_ga=GA{str(giveint())} _gat=1;{(self.randstr(giveint()))}; __cfduid={self.randstr(giveint(), chars="qwertyuiopasdfghjklzxcvbnm0123456789")}; {self.randstr(giveint())}={self.randstr(giveint())}'
+            f'id={self.randstr(giveint())}',
+            f'PHPSESSID={self.randstr(giveint())}; csrftoken={self.randstr(giveint())}; _gat={str(giveint())}',
+            f'cf_chl_2={self.randstr(giveint())}; cf_chl_prog=x11; cf_clearance={self.randstr(giveint())}',
+            f'__cf_bm={self.randstr(giveint())}; __cf_bm={self.randstr(giveint())}',
+            f'language=en; AKA_A2={self.randstr(giveint())}; AMCVS_3AE7BD6E597F48940A495ED0%40AdobeOrg={str(giveint())}; AMCV_{self.randstr(giveint())}={self.randstr(giveint())}; ak_bmsc={self.randstr(giveint(), chars="QWERTYUIOPASDFGHJKLZXCVBNM")}~{self.randstr(giveint())}'
         ])
 
         # add a expiration date to the cookie
