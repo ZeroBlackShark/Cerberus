@@ -22,19 +22,12 @@ SOFTWARE.
 
 '''
 
-'''
-HTTP GET flood module
-'''
-
 import time, requests
 from src.core import Core
 from src.utils import *
 from src.useragent import *
 
 def flood(attack_id, url, stoptime) -> None:
-    '''
-    launches a HTTP GET flood
-    '''
 
     while time.time() < stoptime and Core.attackrunning:
         try:

