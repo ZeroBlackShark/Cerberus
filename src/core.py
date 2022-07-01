@@ -36,3 +36,5 @@ class Core:
     ddosguard_cookies_grabbed = False
     proxy_pool = []
     proxy_proto = None
+    targets = None
+    recursive_urls = None
